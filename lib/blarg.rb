@@ -2,7 +2,7 @@ require "blarg/version"
 require 'pry'
 require 'camping'
 
-BLOG_REPO = '/Users/brit/projects/improvedmeans/'
+BLOG_REPO = '/Users/dylandechant/tiy/blarg/improvedmeans/'
 
 Camping.goes :Blarg
 
@@ -190,5 +190,29 @@ def Blarg.create
   Blarg::Models.create_schema
 end
 
+#top_tags: A method that prints a sorted list of the top 10 most used tags in my blog along with a count of how many times they were used.
+def top_tags
+  popular_tags = {}
+  Blarg::Models::Post.find_each do |post|
+    post.tags.each do |singletag|
+      if popular_tags.has_key?(singletag)
+        popular_tags[singletag] += 1
+      else
+        popular_tags[singletag] = 1
+      end
+    end
+  end
+  top_10_tags = popular_tags.sort_by {|key, value| value}.reverse
+  puts top_10_tags.first 10
+  gets
+end
+
+
+
+
+#top_months: A method that prints a sorted list of the top 6 months ranked by number of posts.
+def top_months
+
+end
 #blog = BlogApp.new
 #blog.run
