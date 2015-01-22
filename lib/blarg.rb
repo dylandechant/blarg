@@ -208,7 +208,11 @@ class BlogApp
     if choice == 'all'
       @importer.each do |p|
         opts = @importer.parse_post(p)
-        Blarg::Models::Post.create(opts)
+        tags = opts.delete(:tags)
+        post = Blarg::Models::Post.create(opts)
+        tags.each do |t|
+          post.tags.create(:name => t)
+        end
       end
     elsif ['y','yes'].include?(choice)
       opts = @importer.choose_post
