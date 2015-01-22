@@ -207,12 +207,24 @@ def top_tags
   gets
 end
 
-
-
-
 #top_months: A method that prints a sorted list of the top 6 months ranked by number of posts.
 def top_months
-
+  dates = Blarg::Models::Post.group(:date).reverse
+  popular_months = {}
+  dates.each do |x|
+    # puts x.date.to_s
+    # gets
+    str = x.date.to_s[0,7]
+    if popular_months.has_key?(str)
+      popular_months[str] += 1
+    else
+      popular_months[str] = 1
+    end
+  end
+  top_6_months = popular_months
+  top_6_months = top_6_months.first 6
+  puts top_6_months.sort_by {|key, value| value}
+  gets
 end
 #blog = BlogApp.new
 #blog.run
