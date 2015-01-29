@@ -202,7 +202,7 @@ def top_tags
       end
     end
   end
-  top_10_tags = popular_tags.sort_by {|key, value| value}.reverse
+  top_10_tags = popular_tags.sort_by {|key, value| -value}
   puts top_10_tags.first 10
   gets
 end
@@ -212,8 +212,6 @@ def top_months
   dates = Blarg::Models::Post.group(:date).reverse
   popular_months = {}
   dates.each do |x|
-    # puts x.date.to_s
-    # gets
     str = x.date.to_s[0,7]
     if popular_months.has_key?(str)
       popular_months[str] += 1
@@ -221,9 +219,8 @@ def top_months
       popular_months[str] = 1
     end
   end
-  top_6_months = popular_months
-  top_6_months = top_6_months.first 6
-  puts top_6_months.sort_by {|key, value| value}
+  top_6_months = popular_months.first 6
+  puts top_6_months.sort_by {|key, value| value}.to_h
   gets
 end
 #blog = BlogApp.new
