@@ -103,6 +103,81 @@ module Blarg
   end
 end
 
+ # def server(request)
+ #   @routing.each do |route, controller|
+ #     if request.url =~ route
+ #       @controller = controller.new(request)
+ #       # request.http_method => :get, :post, :delete, etc
+ #       @controller.call(request.http_method)
+ #     end
+ #   end
+ # end
+
+module Blarg::Controllers
+  class PostController < R '/posts/(\d+)'
+    def get(id)
+      post = Blarg::Models::Post.find(id)
+      post.to_json
+    rescue ActiveRecord::RecordNotFound
+      @status = 404
+      "404 - Page Not Found"
+    end
+
+    def put(id)
+    end
+
+    def delete(id)
+      if @input['password'] == 'cookies'
+        begin
+          post = Blarg::Models::Post.find(id)
+          post.destroy
+          @status = 204
+        rescue ActiveRecord::RecordNotFound
+          @status = 404
+          "You crazy."
+        end
+      else
+        @status = 403
+        "GET OUT FOOL!"
+      end
+    end
+  end
+
+  class PostsController < R '/posts'
+    def get
+      page = @input['page'].to_i || 1
+      start = (page - 1) * 20
+      finish = (page * 20) - 1
+      Blarg::Models::Post.where(:id => [start .. finish]).to_json
+    end
+
+    def post
+      new_post = Blarg::Models::Post.new
+      [:title, :format, :date, :text].each do |k|
+        new_post[k] = @input[k]
+      end
+
+      tags = @input['tags'].split(',').map do |t|
+        tag = Blarg::Models::Tag.find_or_create_by(:name => t)
+      end
+      new_post.tags = tags
+      new_post.save
+
+      @status = 201
+      {:message => "Post #{new_post.id} created",
+       :code => 201,
+       :post => new_post}.to_json
+    end
+  end
+
+  class Intro < R '/welcome/to/the/([^/]+)'
+    def get(stuff)
+      binding.pry
+      "This is the intro controller: #{stuff}"
+    end
+  end
+end
+
 module Promptable
   def prompt(question, validator, error_msg, clear: nil)
     `clear` if clear
